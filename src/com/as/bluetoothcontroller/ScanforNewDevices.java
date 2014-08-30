@@ -47,7 +47,6 @@ public class ScanforNewDevices extends ListActivity {
 		Toast.makeText(ScanforNewDevices.this, "Scanning.. ", Toast.LENGTH_LONG).show();
 		
 		IntentFilter filter = new IntentFilter();
-		
 		filter.addAction(BluetoothDevice.ACTION_FOUND);
 		filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
 		filter.addAction(BluetoothDevice.ACTION_BOND_STATE_CHANGED);
@@ -73,16 +72,15 @@ public class ScanforNewDevices extends ListActivity {
 	        	storeBD(bdevices.size());
 	        }
 	        else if (BluetoothDevice.ACTION_BOND_STATE_CHANGED.equals(action)) {
-                final int state        = intent.getIntExtra(BluetoothDevice.EXTRA_BOND_STATE, BluetoothDevice.ERROR);
-                final int prevState    = intent.getIntExtra(BluetoothDevice.EXTRA_PREVIOUS_BOND_STATE, BluetoothDevice.ERROR);
+                final int state = intent.getIntExtra(BluetoothDevice.EXTRA_BOND_STATE, BluetoothDevice.ERROR);
+                final int prevState = intent.getIntExtra(BluetoothDevice.EXTRA_PREVIOUS_BOND_STATE, BluetoothDevice.ERROR);
 
                 if (state == BluetoothDevice.BOND_BONDED && prevState == BluetoothDevice.BOND_BONDING) {
                     Toast.makeText(ScanforNewDevices.this, "Paired", Toast.LENGTH_LONG).show();
                 } else if (state == BluetoothDevice.BOND_NONE && prevState == BluetoothDevice.BOND_BONDED){
                 	Toast.makeText(ScanforNewDevices.this, "Un Paired", Toast.LENGTH_LONG).show();
                 }
-
-           }
+            }
 	    }
 
 		private void storeBD(int size) {
@@ -99,7 +97,7 @@ public class ScanforNewDevices extends ListActivity {
         try {
             Method method = device.getClass().getMethod("createBond", (Class[]) null);
             method.invoke(device, (Object[]) null);
-           // new AcceptThread().start();
+            new AcceptThread().start();
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -20,26 +20,27 @@ import android.widget.Toast;
 
 public class PairedDevices extends ListActivity {
 
-	private BluetoothAdapter BA;
+	private BluetoothAdapter mBluetoothAdapter;
 	private Set<BluetoothDevice> pairedDevices;
 	ArrayAdapter<String>  adapter;
 	BluetoothDevice mPairedDevices [];
-	private OutputStream outputStream;
 	String command;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_paired_devices);
+		
 		getListView().setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
 
-		BA = BluetoothAdapter.getDefaultAdapter();
-		pairedDevices = BA.getBondedDevices();
+		mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+		pairedDevices = mBluetoothAdapter.getBondedDevices();
+		
 		adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_checked);
 		mPairedDevices = new BluetoothDevice [pairedDevices.size()];
 		setListAdapter(adapter);
-		int i=0;
-		for(BluetoothDevice bt: pairedDevices){
+		int i = 0;
+		for(BluetoothDevice bt: pairedDevices) {
 			adapter.add(bt.getName()+"\n"+bt.getAddress());
 			mPairedDevices[i] = bt;
 			i++;
@@ -61,6 +62,7 @@ public class PairedDevices extends ListActivity {
 			Toast.makeText(PairedDevices.this, command+"02", Toast.LENGTH_LONG).show();
 			command = command+"02";
 		}
+		
 		sendData(position);
 	}
 	
@@ -74,20 +76,7 @@ public class PairedDevices extends ListActivity {
 			clientSocket.connect();
 			os = new DataOutputStream(clientSocket.getOutputStream());
 			new clientSock().start();
-		} catch (NoSuchMethodException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IllegalArgumentException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InvocationTargetException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
