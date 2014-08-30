@@ -86,6 +86,7 @@ public class PairedDevices extends ListActivity {
 	        try {
 	            os.write(command.getBytes()); 
 	            os.flush();
+	            os.close();
 	        } catch (Exception e1) {
 	            e1.printStackTrace();
 	            return;
