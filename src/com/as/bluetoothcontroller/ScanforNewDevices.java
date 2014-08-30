@@ -1,12 +1,15 @@
 package com.as.bluetoothcontroller;
 
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Set;
+import java.util.UUID;
 
 import android.app.ListActivity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothServerSocket;
+import android.bluetooth.BluetoothSocket;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -19,14 +22,17 @@ import android.widget.Toast;
 
 public class ScanforNewDevices extends ListActivity {
 
-	private BluetoothAdapter BA;
-	private Set<BluetoothDevice> pairedDevices;
-	ArrayAdapter<String>  adapter;
-	BluetoothDevice mPairedDevices [];
-	ArrayList<BluetoothDevice> bdevices;
-	BluetoothDevice BTD [];
+	private BluetoothAdapter mBluetoothAdapter;
+	private ArrayAdapter<String>  adapter;
+	private ArrayList<BluetoothDevice> bdevices;
+	private BluetoothDevice BTD [];
+	private String NAME = "BluetoothController";
+	
+	private static final UUID MY_UUID = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb");
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
+	
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_paired_devices);
 				
@@ -35,8 +41,8 @@ public class ScanforNewDevices extends ListActivity {
 		setListAdapter(adapter);
 		
 		bdevices = new ArrayList<BluetoothDevice>();
-		BA = BluetoothAdapter.getDefaultAdapter();
-		BA.startDiscovery();
+		mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+		mBluetoothAdapter.startDiscovery();
 		
 		Toast.makeText(ScanforNewDevices.this, "Scanning.. ", Toast.LENGTH_LONG).show();
 		
@@ -47,9 +53,8 @@ public class ScanforNewDevices extends ListActivity {
 		filter.addAction(BluetoothDevice.ACTION_BOND_STATE_CHANGED);
 		
 		registerReceiver(mReceiver, filter);
-		
-		
 	}
+	
 	private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
 	    public void onReceive(Context context, Intent intent) {
 	        String action = intent.getAction();
@@ -87,7 +92,6 @@ public class ScanforNewDevices extends ListActivity {
 				BTD[i] = bd;
 				i++;
 			}
-			
 		}
 	};
 
@@ -95,6 +99,7 @@ public class ScanforNewDevices extends ListActivity {
         try {
             Method method = device.getClass().getMethod("createBond", (Class[]) null);
             method.invoke(device, (Object[]) null);
+           // new AcceptThread().start();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -131,4 +136,45 @@ public class ScanforNewDevices extends ListActivity {
 		}
 	}
 	
+	private class AcceptThread extends Thread {
+	    private final BluetoothServerSocket mmServerSocket;
+	 
+	    public AcceptThread() {
+	        // Use a temporary object that is later assigned to mmServerSocket,
+	        // because mmServerSocket is final
+	        BluetoothServerSocket tmp = null;
+	        try {
+	            // MY_UUID is the app's UUID string, also used by the client code
+	            tmp = mBluetoothAdapter.listenUsingRfcommWithServiceRecord(NAME, MY_UUID);
+	        } catch (IOException e) { }
+	        mmServerSocket = tmp;
+	    }
+	 
+	    public void run() {
+	        BluetoothSocket socket = null;
+	        // Keep listening until exception occurs or a socket is returned
+	        while (true) {
+	            try {
+	                socket = mmServerSocket.accept();
+	            } catch (IOException e) {
+	                break;
+	            }
+	            // If a connection was accepted
+	            if (socket != null) {
+	            	Toast.makeText(getApplicationContext(), "connection was accepted", Toast.LENGTH_LONG).show();
+	                // Do work to manage the connection (in a separate thread)
+	                // manageConnectedSocket(socket);
+	                // mmServerSocket.close();
+	                break;
+	            }
+	        }
+	    }
+	 
+	    /** Will cancel the listening socket, and cause the thread to finish */
+	    public void cancel() {
+	        try {
+	            mmServerSocket.close();
+	        } catch (IOException e) { }
+	    }
+	}
 }
