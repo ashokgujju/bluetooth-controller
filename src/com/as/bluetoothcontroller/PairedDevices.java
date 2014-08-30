@@ -52,15 +52,15 @@ public class PairedDevices extends ListActivity {
 	protected void onListItemClick(ListView l, View v, int position, long id) {
 		super.onListItemClick(l, v, position, id);
 		
-		command = "100"+(position+1);
+		command = "*10|0"+(position+1);
 		
-		if(getListView().isItemChecked(position)) {
-			Toast.makeText(PairedDevices.this, command+"03", Toast.LENGTH_LONG).show();
-			command = command+"03";
+		if(getListView().isItemChecked(position)) {			
+			command = command+"|03#";
+			Toast.makeText(PairedDevices.this, command, Toast.LENGTH_LONG).show();
 		}
-		else {
-			Toast.makeText(PairedDevices.this, command+"02", Toast.LENGTH_LONG).show();
-			command = command+"02";
+		else {			
+			command = command+"|02#";
+			Toast.makeText(PairedDevices.this, command, Toast.LENGTH_LONG).show();
 		}
 		
 		sendData(position);

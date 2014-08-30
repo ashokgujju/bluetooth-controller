@@ -44,7 +44,7 @@ public class ScanforNewDevices extends ListActivity {
 		mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 		mBluetoothAdapter.startDiscovery();
 		
-		Toast.makeText(ScanforNewDevices.this, "Scanning.. ", Toast.LENGTH_LONG).show();
+		Toast.makeText(ScanforNewDevices.this, "Scanning.. Wait till \"SCAN OVER\" notification", Toast.LENGTH_LONG).show();
 		
 		IntentFilter filter = new IntentFilter();
 		filter.addAction(BluetoothDevice.ACTION_FOUND);
@@ -64,7 +64,7 @@ public class ScanforNewDevices extends ListActivity {
 	            // Add the name and address to an array adapter to show in a ListView
 	            bdevices.add(device);
 	            adapter.add(device.getName() + "\n" + device.getAddress());
-	            Toast.makeText(ScanforNewDevices.this, "Scanning.. Wait till \"SCAN OVER\" notification", Toast.LENGTH_LONG).show();
+	            Toast.makeText(ScanforNewDevices.this, "Scanning.. Wait till \"SCAN OVER\" notification", Toast.LENGTH_SHORT).show();
 	            adapter.notifyDataSetChanged();
 	        }
 	        else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
